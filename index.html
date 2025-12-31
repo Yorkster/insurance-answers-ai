@@ -28,6 +28,50 @@
     .share-buttons { margin: 30px 0; display: none; }
     .share-buttons a { margin: 0 15px; color: #3b82f6; text-decoration: none; font-weight: 600; font-size: 1.1em; }
     @media (max-width: 768px) { .bio-section { flex-direction: column; text-align: center; } .bio-section img { margin: 0 0 20px; } }
+    .chat-history {
+  max-height: 500px;
+  overflow-y: auto;
+  margin: 20px 0;
+  padding: 15px;
+  background: #f8fafa;
+  border-radius: 12px;
+  border: 1px solid #e0e7ff;
+}
+
+.message-pair {
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.message-pair:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.question-bubble {
+  background: #e0e7ff;
+  color: #1e40af;
+  padding: 12px 18px;
+  border-radius: 18px;
+  margin-bottom: 10px;
+  max-width: 80%;
+  align-self: flex-start;
+  display: inline-block;
+}
+
+.answer-bubble {
+  background: #f0f9ff;
+  padding: 18px 22px;
+  border-radius: 18px;
+  border-left: 5px solid #3b82f6;
+  max-width: 95%;
+}
+
+.response-bubble {
+  margin-top: 20px;
+  min-height: 80px;
+}
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -53,7 +97,27 @@
       <p style="color:#666; max-width:700px; margin:20px auto;">Examples: "What does a deductible mean?", "How does cyber insurance work?", "What's covered under D&O?"</p>
       <input type="text" id="question" placeholder="Type your insurance question here...">
       <button onclick="getAnswer()">Ask AI</button>
-      <div id="response"></div>
+   <div class="chat-box">
+  <h2>Ask me anything about insurance</h2>
+  <p style="color:#666; max-width:700px; margin:20px auto;">Examples: "What does a deductible mean?", "How does cyber insurance work?", "What's covered under D&O?"</p>
+
+  <!-- Chat History Area -->
+  <div id="chatHistory" class="chat-history">
+    <!-- Previous messages will appear here -->
+  </div>
+
+  <!-- Response Area (now only for the latest answer) -->
+  <div id="response" class="response-bubble"></div>
+
+  <input type="text" id="question" placeholder="Type your insurance question here..." autocomplete="off">
+  <button onclick="getAnswer()">Ask</button>
+
+  <div class="share-buttons" id="shareSection">
+    <p>Share this answer:</p>
+    <a href="#" onclick="shareLinkedIn()"><i class="fab fa-linkedin"></i> LinkedIn</a>
+    <a href="#" onclick="shareX()"><i class="fab fa-x-twitter"></i> X (Twitter)</a>
+  </div>
+</div>
       <div class="share-buttons" id="shareSection">
         <p>Share this answer:</p>
         <a href="#" onclick="shareLinkedIn()"><i class="fab fa-linkedin"></i> LinkedIn</a>
@@ -71,21 +135,54 @@
     <p><small>This tool provides general educational information only and is not personalized insurance or financial advice. Always consult a licensed professional for your specific situation.</small></p>
   </footer>
 
- <script>
+<script>
+  // Load chat history on page load
+  window.onload = function() {
+    loadChatHistory();
+  };
+
+  function loadChatHistory() {
+    const history = JSON.parse(localStorage.getItem('insuranceChatHistory') || '[]');
+    const chatHistoryDiv = document.getElementById('chatHistory');
+    chatHistoryDiv.innerHTML = '';
+
+    history.forEach(pair => {
+      const pairDiv = document.createElement('div');
+      pairDiv.className = 'message-pair';
+      pairDiv.innerHTML = `
+        <div class="question-bubble"><strong>You:</strong> ${pair.question}</div>
+        <div class="answer-bubble">${pair.answer.replace(/\n/g, '<br>')}</div>
+      `;
+      chatHistoryDiv.appendChild(pairDiv);
+    });
+
+    chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
+  }
+
+  function saveChatHistory(question, answer) {
+    const history = JSON.parse(localStorage.getItem('insuranceChatHistory') || '[]');
+    history.push({ question, answer });
+    if (history.length > 10) history.shift(); // Keep only last 10 conversations
+    localStorage.setItem('insuranceChatHistory', JSON.stringify(history));
+  }
+
   async function getAnswer() {
-    const question = document.getElementById('question').value.trim();
+    const questionInput = document.getElementById('question');
+    const question = questionInput.value.trim();
     const responseDiv = document.getElementById('response');
     const shareSection = document.getElementById('shareSection');
 
     if (!question) {
       responseDiv.innerHTML = "<p style='color:red;'>Please enter a question!</p>";
-      responseDiv.style.display = 'block';
       return;
     }
 
+    // Show loading
     responseDiv.innerHTML = "<p><strong>Thinking...</strong> Asking Grok as an insurance expert...</p>";
-    responseDiv.style.display = 'block';
     shareSection.style.display = 'none';
+
+    // Clear input
+    questionInput.value = '';
 
     try {
       const res = await fetch('/api/ask', {
@@ -96,19 +193,20 @@
 
       const data = await res.json();
 
-      if (!res.ok) {
-        throw new Error(data.error || 'Unknown error');
-      }
+      if (!res.ok) throw new Error(data.error || 'Unknown error');
 
-      responseDiv.innerHTML = `
-        <p><strong>Your Question:</strong> ${question}</p>
-        <hr>
-        <p>${data.answer.replace(/\n/g, '<br>')}</p>
-      `;
+      const formattedAnswer = data.answer.replace(/\n/g, '<br>');
+
+      // Display latest answer
+      responseDiv.innerHTML = `<div class="answer-bubble">${formattedAnswer}</div>`;
       shareSection.style.display = 'block';
+
+      // Save and reload history
+      saveChatHistory(question, data.answer);
+      loadChatHistory();
+
     } catch (err) {
-      responseDiv.innerHTML = `<p style='color:red;'>Error: ${err.message}. Check console or try again.</p>`;
-      console.error(err);
+      responseDiv.innerHTML = `<p style='color:red;'>Error: ${err.message}. Try again.</p>`;
     }
   }
 
@@ -117,7 +215,7 @@
   }
 
   function shareX() {
-    const text = "Just got a smart insurance answer from Insurance Answers AI:";
+    const text = "Just got a helpful insurance answer from Insurance Answers:";
     window.open('https://x.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent('https://insuranceanswersai.ca'));
   }
 </script>
