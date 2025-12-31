@@ -1,5 +1,4 @@
-// api/ask.js - Vercel Serverless Function
-import fetch from 'node-fetch'; // Vercel includes this
+// api/ask.js - Updated for native fetch (no import needed)
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -12,7 +11,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'No question provided' });
   }
 
-  const apiKey = process.env.XAI_API_KEY; // We'll set this in Vercel env vars
+  const apiKey = process.env.XAI_API_KEY;
 
   if (!apiKey) {
     return res.status(500).json({ error: 'API key not configured' });
@@ -26,14 +25,14 @@ export default async function handler(req, res) {
         'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'grok-4', // Or 'grok-beta' for cheaper; 'grok-4' is the best
+        model: 'grok-4',  // Or try 'grok-beta' if you want cheaper/faster
         messages: [
           {
             role: 'system',
             content: `You are an expert insurance educator curated by Brayden York, RIMS-CRMP certified commercial insurance professional in Canada. 
 Provide clear, accurate, unbiased answers based on standard Canadian and global insurance practices. 
-Keep responses educational, professional, and concise (200-400 words). 
-If the question is about specific advice, remind that this is general info and they should consult a licensed broker.`
+Keep responses professional, educational, and concise (200-400 words). 
+End with: "For personalized advice, book a free consultation at insuranceanswersai.ca"`
           },
           { role: 'user', content: question }
         ],
@@ -43,15 +42,24 @@ If the question is about specific advice, remind that this is general info and t
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      return res.status(500).json({ error: error.error?.message || 'API error' });
+      const errorData = await response.json().catch(() => ({}));
+      console.error('xAI API error:', errorData);
+      return res.status(500).json({ error: 'AI service error' });
     }
 
     const data = await response.json();
-    const answer = data.choices[0].message.content;
+    const answer = data.choices[0].message.content.trim();
 
     res.status(200).json({ answer });
   } catch (error) {
+    console.error('Server error:', error);
     res.status(500).json({ error: 'Server error' });
   }
 }
+
+// This ensures body parsing works correctly
+export const config = {
+  api: {
+    bodyParser: true,
+  },
+};
