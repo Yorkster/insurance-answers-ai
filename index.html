@@ -3,69 +3,72 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Insurance Answers AI</title>
-  <meta name="description" content="Get clear, expert answers to your insurance questions – powered by AI and curated by Brayden York, RIMS-CRMP certified risk professional.">
+  <title>Insurance Answers AI - Expert Insurance Q&A Powered by AI</title>
+  <meta name="description" content="Get clear, accurate answers to your insurance questions. Powered by Grok AI and curated by Brayden York, RIMS-CRMP certified commercial insurance expert.">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-    body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background: #f8fafa; color: #333; }
-    header { background: linear-gradient(135deg, #1e40af, #3b82f6); color: white; text-align: center; padding: 60px 20px; }
-    h1 { margin: 0; font-size: 2.8em; }
-    h2 { font-size: 1.4em; font-weight: 400; margin: 10px 0 0; }
-    .container { max-width: 900px; margin: 40px auto; padding: 20px; }
-    .bio-section { display: flex; align-items: center; background: white; border-radius: 12px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); margin-bottom: 40px; }
-    .bio-section img { border-radius: 50%; width: 120px; height: 120px; object-fit: cover; margin-right: 30px; }
-    .bio-text h3 { margin: 0 0 10px; font-size: 1.6em; }
-    .bio-text p { margin: 5px 0; line-height: 1.6; }
-    .chat-box { background: white; border-radius: 12px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; }
-    #question { width: 100%; max-width: 700px; padding: 15px; font-size: 1.1em; border: 2px solid #ddd; border-radius: 8px; margin: 20px 0; }
-    button { background: #3b82f6; color: white; border: none; padding: 15px 30px; font-size: 1.2em; border-radius: 8px; cursor: pointer; transition: 0.3s; }
-    button:hover { background: #2563eb; }
-    #response { margin-top: 30px; text-align: left; background: #f0f9ff; padding: 20px; border-radius: 8px; min-height: 100px; display: none; }
-    .cta { margin: 40px 0; text-align: center; }
-    .cta a { background: #10b981; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; }
-    footer { text-align: center; padding: 30px; color: #666; font-size: 0.9em; }
-    .share-buttons { margin: 20px 0; }
-    .share-buttons a { margin: 0 10px; color: #3b82f6; text-decoration: none; }
+    body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background: #f8fafa; color: #333; line-height: 1.6; }
+    header { background: linear-gradient(135deg, #1e40af, #3b82f6); color: white; text-align: center; padding: 80px 20px; }
+    h1 { margin: 0; font-size: 3em; }
+    h2 { font-size: 1.5em; font-weight: 400; margin: 15px 0 0; opacity: 0.95; }
+    .container { max-width: 960px; margin: 40px auto; padding: 20px; }
+    .bio-section { display: flex; align-items: center; background: white; border-radius: 16px; padding: 40px; box-shadow: 0 6px 30px rgba(0,0,0,0.1); margin-bottom: 50px; flex-wrap: wrap; }
+    .bio-section img { border-radius: 50%; width: 140px; height: 140px; object-fit: cover; margin-right: 40px; border: 4px solid #e0e7ff; flex-shrink: 0; }
+    .bio-text h3 { margin: 0 0 10px; font-size: 1.8em; color: #1e40af; }
+    .bio-text p { margin: 8px 0; }
+    .chat-box { background: white; border-radius: 16px; padding: 40px; box-shadow: 0 6px 30px rgba(0,0,0,0.1); text-align: center; }
+    #question { width: 100%; max-width: 760px; padding: 18px; font-size: 1.2em; border: 2px solid #ddd; border-radius: 12px; margin: 25px 0; box-sizing: border-box; }
+    button { background: #3b82f6; color: white; border: none; padding: 16px 36px; font-size: 1.3em; border-radius: 12px; cursor: pointer; transition: 0.3s; font-weight: 600; }
+    button:hover { background: #2563eb; transform: translateY(-2px); }
+    #response { margin-top: 40px; text-align: left; background: #f0f9ff; padding: 30px; border-radius: 12px; min-height: 120px; display: none; border-left: 5px solid #3b82f6; }
+    .cta { margin: 50px 0; text-align: center; }
+    .cta a { background: #10b981; color: white; padding: 18px 40px; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 1.2em; display: inline-block; }
+    .cta a:hover { background: #059669; }
+    footer { text-align: center; padding: 40px; color: #666; font-size: 0.95em; border-top: 1px solid #eee; margin-top: 60px; }
+    .share-buttons { margin: 30px 0; display: none; }
+    .share-buttons a { margin: 0 15px; color: #3b82f6; text-decoration: none; font-weight: 600; font-size: 1.1em; }
+    @media (max-width: 768px) { .bio-section { flex-direction: column; text-align: center; } .bio-section img { margin: 0 0 20px; } }
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
   <header>
     <h1>Insurance Answers AI</h1>
-    <h2>Get clear, expert answers to all your insurance questions</h2>
+    <h2>Get clear, expert answers to your insurance questions — instantly</h2>
   </header>
 
   <div class="container">
     <div class="bio-section">
-      <img src= "https://media.licdn.com/dms/image/v2/D4E03AQFz4kXz4kXz4k/profile-displayphoto-shrink_800_800/0/1729190400000?e=1736985600&v=beta&t=somehash" alt="Brayden York">
+      <img src="https://media.licdn.com/dms/image/v2/D4E03AQFz4kXz4kXz4k/profile-displayphoto-shrink_800_800/0/1729190400000?e=1736985600&v=beta&t=4oD8i3b8i3b8i3b8i3b8i3b8i3b8i3b8" alt="Brayden York" onerror="this.src='https://via.placeholder.com/140?text=Brayden+York';">
       <div class="bio-text">
         <h3>Brayden York, RIMS-CRMP</h3>
         <p>Commercial Insurance & Risk Management Expert</p>
-        <p>Helping businesses navigate complex risks with practical, tailored strategies.</p>
-        <p>Certified Risk Management Professional (RIMS-CRMP) | Passionate about educating clients on coverage gaps, emerging risks, and smart protection.</p>
+        <p>Helping Canadian businesses protect against risk with smart, tailored coverage strategies.</p>
+        <p>Certified Risk Management Professional (RIMS-CRMP) | Focused on cyber, D&O, property, and emerging risks.</p>
       </div>
     </div>
 
     <div class="chat-box">
       <h2>Ask me anything about insurance</h2>
-      <input type="text" id="question" placeholder="e.g., What does Directors & Officers insurance cover? Or how does a deductible work?">
-      <button onclick="getAnswer()">Ask</button>
+      <p style="color:#666; max-width:700px; margin:20px auto;">Examples: "What does a deductible mean?", "How does cyber insurance work?", "What's covered under D&O?"</p>
+      <input type="text" id="question" placeholder="Type your insurance question here...">
+      <button onclick="getAnswer()">Ask AI</button>
       <div id="response"></div>
-      <div class="share-buttons" id="shareSection" style="display:none;">
+      <div class="share-buttons" id="shareSection">
         <p>Share this answer:</p>
         <a href="#" onclick="shareLinkedIn()"><i class="fab fa-linkedin"></i> LinkedIn</a>
-        <a href="#" onclick="shareX()"><i class="fab fa-x-twitter"></i> X/Twitter</a>
+        <a href="#" onclick="shareX()"><i class="fab fa-x-twitter"></i> X (Twitter)</a>
       </div>
     </div>
 
     <div class="cta">
-      <a href="https://calendly.com/york-brayden/30min" target="_blank">Book a Free 30-Min Consultation</a>
+      <a href="https://calendly.com/york-brayden/30min" target="_blank">Book a Free 30-Minute Consultation</a>
     </div>
   </div>
 
   <footer>
-    <p>Powered by Grok AI | Curated by Brayden York</p>
-    <p><small>This tool provides educational information only and is not personalized financial advice. Always consult a licensed professional for your specific needs.</small></p>
+    <p>InsuranceAnswersAI.ca | Powered by Grok AI | Curated by Brayden York</p>
+    <p><small>This tool provides general educational information only and is not personalized insurance or financial advice. Always consult a licensed professional for your specific situation.</small></p>
   </footer>
 
   <script>
@@ -75,24 +78,31 @@
       const shareSection = document.getElementById('shareSection');
       
       if (!question) {
-        responseDiv.innerHTML = "<p>Please enter a question!</p>";
+        responseDiv.innerHTML = "<p style='color:red;'>Please enter a question!</p>";
         responseDiv.style.display = 'block';
         return;
       }
 
-      responseDiv.innerHTML = "<p><strong>Sample Answer (Grok API will replace this tomorrow):</strong><br><br>Here's a clear explanation based on standard insurance practices...<br><br>[Detailed expert response would appear here once we connect the AI]</p>";
+      responseDiv.innerHTML = `
+        <p><strong>Your Question:</strong> ${question}</p>
+        <p><strong>Answer (Live Grok AI coming tomorrow):</strong></p>
+        <p>Here's a clear, expert explanation based on standard Canadian and global insurance practices...<br><br>
+        [Once we connect the Grok API, a real-time, accurate response will appear here automatically.]</p>
+        <p style="font-style:italic; color:#555;">Example topics: deductibles, liability limits, claims process, cyber coverage, D&O, business interruption, and more.</p>
+      `;
       responseDiv.style.display = 'block';
       shareSection.style.display = 'block';
     }
 
     function shareLinkedIn() {
-      const text = "Great insurance insight from Insurance Answers AI:";
-      window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(location.href)}`);
+      const url = "https://insuranceanswersai.ca";
+      const title = "Just asked Insurance Answers AI a question!";
+      window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`);
     }
 
     function shareX() {
-      const text = "Just got a helpful insurance answer from @InsuranceAnswersAI";
-      window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(location.href)}`);
+      const text = "Check out this AI-powered insurance Q&A tool by @BraydenYork: insuranceanswersai.ca";
+      window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`);
     }
   </script>
 </body>
