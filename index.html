@@ -72,6 +72,28 @@
   margin-top: 20px;
   min-height: 80px;
 }
+    .thinking-indicator {
+  text-align: center;
+  padding: 30px;
+  color: #3b82f6;
+  font-size: 1.1em;
+  min-height: 100px;
+}
+
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3b82f6;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Google Analytics -->
@@ -116,7 +138,9 @@
   </div>
 
   <!-- Response Area (now only for the latest answer) -->
-  <div id="response" class="response-bubble"></div>
+<div id="response" class="response-bubble">
+  <!-- Latest answer or thinking indicator will appear here -->
+</div>
 
   <div class="share-buttons" id="shareSection">
     <p>Share this answer:</p>
@@ -172,50 +196,57 @@
     localStorage.setItem('insuranceChatHistory', JSON.stringify(history));
   }
 
-  async function getAnswer() {
-    const questionInput = document.getElementById('question');
-    const question = questionInput.value.trim();
-    const responseDiv = document.getElementById('response');
-    const shareSection = document.getElementById('shareSection');
+ async function getAnswer() {
+  const questionInput = document.getElementById('question');
+  const question = questionInput.value.trim();
+  const responseDiv = document.getElementById('response');
+  const shareSection = document.getElementById('shareSection');
 
-    if (!question) {
-      responseDiv.innerHTML = "<p style='color:red;'>Please enter a question!</p>";
-      return;
-    }
-
-    // Show loading
-    responseDiv.innerHTML = "<p><strong>Thinking...</strong> Asking Grok as an insurance expert...</p>";
-    shareSection.style.display = 'none';
-
-    // Clear input
-    questionInput.value = '';
-
-    try {
-      const res = await fetch('/api/ask', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question })
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.error || 'Unknown error');
-
-      const formattedAnswer = data.answer.replace(/\n/g, '<br>');
-
-      // Display latest answer
-      responseDiv.innerHTML = `<div class="answer-bubble">${formattedAnswer}</div>`;
-      shareSection.style.display = 'block';
-
-      // Save and reload history
-      saveChatHistory(question, data.answer);
-      loadChatHistory();
-
-    } catch (err) {
-      responseDiv.innerHTML = `<p style='color:red;'>Error: ${err.message}. Try again.</p>`;
-    }
+  if (!question) {
+    responseDiv.innerHTML = "<p style='color:red;'>Please enter a question!</p>";
+    return;
   }
 
+  // Immediately show thinking indicator
+  responseDiv.innerHTML = `
+    <div class="thinking-indicator">
+      <div class="spinner"></div>
+      <p><strong>Thinking...</strong> Analyzing your question as an insurance expert...</p>
+    </div>
+  `;
+  shareSection.style.display = 'none';
+
+  // Clear input
+  questionInput.value = '';
+
+  try {
+    const res = await fetch('/api/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error || 'Unknown error');
+
+    const formattedAnswer = data.answer.replace(/\n/g, '<br>');
+
+    // Show the new answer
+    responseDiv.innerHTML = `<div class="answer-bubble">${formattedAnswer}</div>`;
+    shareSection.style.display = 'block';
+
+    // Save and update history
+    saveChatHistory(question, data.answer);
+    loadChatHistory();
+
+    // Scroll to latest answer
+    responseDiv.scrollIntoView({ behavior: 'smooth' });
+
+  } catch (err) {
+    responseDiv.innerHTML = `<p style='color:red;'>Error: ${err.message}. Please try again.</p>`;
+  }
+}
   function shareLinkedIn() {
     window.open('https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent('https://insuranceanswersai.ca'));
   }
