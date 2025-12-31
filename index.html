@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Insurance Answers</title>
-  <meta name="description" content="Free insurance Q&A tool curated by Brayden York, RIMS-CRMP">
+  <meta name="description" content="Free insurance Q&A tool curated by Brayden York">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
     body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background: #f8fafa; color: #333; line-height: 1.6; }
@@ -38,7 +38,8 @@
 <body>
   <header>
     <h1>Insurance Answers</h1>
-    <h2>Get clear, expert answers to your insurance questions — instantly</h2>
+    <h2>Get clear answers to your insurance questions</h2>
+    <p><small>This site is for general educational information only and may generate incorrect answers. Consult a licensed professional in your area for personalized advice.</small></p>
   </header>
 
   <div class="container">
@@ -46,7 +47,7 @@
       <img src="headshot.jpg" alt="Brayden York">
       <div class="bio-text">
         <h3>Brayden York, RIMS-CRMP</h3>
-        <p>Commercial Insurance & Risk Management Expert</p>
+        <p>Commercial Insurance & Risk Management specilaist</p>
         <p>Helping Canadian businesses protect against risk with smart, tailored coverage strategies.</p>
       </div>
     </div>
@@ -62,6 +63,7 @@
       <input type="text" id="question" placeholder="Type your insurance question here..." onkeypress="if(event.key==='Enter') getAnswer()">
 
       <button onclick="getAnswer()">Ask</button>
+      <button onclick="clearHistory()" style="margin-left:15px; background:#dc2626; padding:12px 24px;">Clear Chat History</button>
 
       <div class="cta">
         <a href="mailto:byork@bflcanada.ca?subject=Insurance%20Consultation%20Request">Email Me for a Free Insurance Consultation</a>
@@ -70,8 +72,8 @@
   </div>
 
   <footer>
-    <p>InsuranceAnswers.ca | Curated by Brayden York, RIMS-CRMP</p>
-    <p><small>General educational information only — consult a licensed professional for personalized advice.</small></p>
+    <p>InsuranceAnswers.ca | Curated by Brayden YorkP</p>
+    <p><small>This site is for general educational information only — consult a licensed professional in your area for personalized advice.</small></p>
   </footer>
 
   <script>
@@ -96,7 +98,13 @@
       if (history.length > 10) history.shift();
       localStorage.setItem('insuranceChatHistory', JSON.stringify(history));
     }
-
+function clearHistory() {
+  if (confirm('Clear all chat history? This cannot be undone.')) {
+    localStorage.removeItem('insuranceChatHistory');
+    document.getElementById('chatHistory').innerHTML = '';
+    document.getElementById('response').innerHTML = '';
+  }
+}
     async function getAnswer() {
       const input = document.getElementById('question');
       const question = input.value.trim();
@@ -109,7 +117,7 @@
       responseDiv.innerHTML = `
         <div class="thinking-indicator">
           <div class="spinner"></div>
-          <p><strong>Thinking...</strong> Analyzing as an insurance expert...<br>(20–40 seconds for detailed answers)</p>
+          <p><strong>Thinking...</strong> Analyzing as an insurance specialist...<br>(20–40 seconds for detailed answers)</p>
         </div>
       `;
 
