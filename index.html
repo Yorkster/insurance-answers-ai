@@ -127,7 +127,7 @@
     <div class="chat-box">
       <h2>Ask me anything about insurance</h2>
       <p style="color:#666; max-width:700px; margin:20px auto;">Examples: "What does a deductible mean?", "How does cyber insurance work?", "What's covered under D&O?"</p>
-      <input type="text" id="question" placeholder="Type your insurance question here...and give it a few seconds">
+      <input type="text" id="question" placeholder="Type your insurance question here...and give it a few seconds" autocomplete="off" onkeypress="if(event.key==='Enter') getAnswer();">
       <button onclick="getAnswer()">Ask</button>
       <button onclick="clearHistory()" style="margin-top:10px; background:#dc2626; padding:10px 20px;">Clear Chat History</button>
    <div class="chat-box">
@@ -167,7 +167,7 @@
   </footer>
 
 <script>
-  // Load chat history on page load
+  // Load history on start
   window.onload = function() {
     loadChatHistory();
   };
@@ -193,61 +193,69 @@
   function saveChatHistory(question, answer) {
     const history = JSON.parse(localStorage.getItem('insuranceChatHistory') || '[]');
     history.push({ question, answer });
-    if (history.length > 10) history.shift(); // Keep only last 10 conversations
+    if (history.length > 10) history.shift();
     localStorage.setItem('insuranceChatHistory', JSON.stringify(history));
   }
 
- async function getAnswer() {
-  const questionInput = document.getElementById('question');
-  const question = questionInput.value.trim();
-  const responseDiv = document.getElementById('response');
-  const shareSection = document.getElementById('shareSection');
+  async function getAnswer() {
+    const questionInput = document.getElementById('question');
+    const question = questionInput.value.trim();
+    const responseDiv = document.getElementById('response');
+    const shareSection = document.getElementById('shareSection');
 
-  if (!question) {
-    responseDiv.innerHTML = "<p style='color:red;'>Please enter a question!</p>";
-    return;
+    if (!question) {
+      responseDiv.innerHTML = "<p style='color:red;'>Please enter a question!</p>";
+      return;
+    }
+
+    // Show thinking spinner immediately
+    responseDiv.innerHTML = `
+      <div class="thinking-indicator">
+        <div class="spinner"></div>
+        <p><strong>Thinking...</strong> Analyzing your question as an insurance expert...</p>
+      </div>
+    `;
+    shareSection.style.display = 'none';
+
+    questionInput.value = '';
+
+    try {
+      const res = await fetch('/api/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || 'Unknown error');
+
+      const formattedAnswer = data.answer.replace(/\n/g, '<br>');
+
+      responseDiv.innerHTML = `<div class="answer-bubble">${formattedAnswer}</div>`;
+      shareSection.style.display = 'block';
+
+      saveChatHistory(question, data.answer);
+      loadChatHistory();
+
+      responseDiv.scrollIntoView({ behavior: 'smooth' });
+
+    } catch (err) {
+      responseDiv.innerHTML = `<p style='color:red;'>Error: ${err.message}. Please try again.</p>`;
+      console.error(err);
+    }
   }
 
-  // Immediately show thinking indicator
-  responseDiv.innerHTML = `
-    <div class="thinking-indicator">
-      <div class="spinner"></div>
-      <p><strong>Thinking...</strong> Analyzing your question...</p>
-    </div>
-  `;
-  shareSection.style.display = 'none';
-
-  // Clear input
-  questionInput.value = '';
-
-  try {
-    const res = await fetch('/api/ask', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question })
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) throw new Error(data.error || 'Unknown error');
-
-    const formattedAnswer = data.answer.replace(/\n/g, '<br>');
-
-    // Show the new answer
-    responseDiv.innerHTML = `<div class="answer-bubble">${formattedAnswer}</div>`;
-    shareSection.style.display = 'block';
-
-    // Save and update history
-    saveChatHistory(question, data.answer);
-    loadChatHistory();
-
-    // Scroll to latest answer
-    responseDiv.scrollIntoView({ behavior: 'smooth' });
-
-  } catch (err) {
-    responseDiv.innerHTML = `<p style='color:red;'>Error: ${err.message}. Please try again.</p>`;
+  function clearHistory() {
+    if (confirm('Clear all chat history?')) {
+      localStorage.removeItem('insuranceChatHistory');
+      document.getElementById('chatHistory').innerHTML = '';
+      document.getElementById('response').innerHTML = '';
+      document.getElementById('shareSection').style.display = 'none';
+    }
   }
-}
+
+  // Share functions
   function shareLinkedIn() {
     window.open('https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent('https://insuranceanswersai.ca'));
   }
@@ -256,14 +264,6 @@
     const text = "Just got a helpful insurance answer from Insurance Answers:";
     window.open('https://x.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent('https://insuranceanswersai.ca'));
   }
-  function clearHistory() {
-  if (confirm('Clear all chat history?')) {
-    localStorage.removeItem('insuranceChatHistory');
-    document.getElementById('chatHistory').innerHTML = '';
-    document.getElementById('response').innerHTML = '';
-    document.getElementById('shareSection').style.display = 'none';
-  }
-}
 </script>
   
 </body>
