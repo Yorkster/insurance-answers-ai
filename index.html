@@ -71,39 +71,54 @@
     <p><small>This tool provides general educational information only and is not personalized insurance or financial advice. Always consult a licensed professional for your specific situation.</small></p>
   </footer>
 
-  <script>
-    function getAnswer() {
-      const question = document.getElementById('question').value.trim();
-      const responseDiv = document.getElementById('response');
-      const shareSection = document.getElementById('shareSection');
-      
-      if (!question) {
-        responseDiv.innerHTML = "<p style='color:red;'>Please enter a question!</p>";
-        responseDiv.style.display = 'block';
-        return;
-      }
+    <script>
+  async function getAnswer() {
+    const question = document.getElementById('question').value.trim();
+    const responseDiv = document.getElementById('response');
+    const shareSection = document.getElementById('shareSection');
 
+    if (!question) {
+      responseDiv.innerHTML = "<p style='color:red;'>Please enter a question!</p>";
+      responseDiv.style.display = 'block';
+      return;
+    }
+
+    responseDiv.innerHTML = "<p><strong>Loading...</strong> Thinking as an insurance expert...</p>";
+    responseDiv.style.display = 'block';
+    shareSection.style.display = 'none';
+
+    try {
+      const res = await fetch('/api/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question })
+      });
+
+      if (!res.ok) throw new Error('API error');
+
+      const data = await res.json();
       responseDiv.innerHTML = `
         <p><strong>Your Question:</strong> ${question}</p>
-        <p><strong>Answer (Live Grok AI coming tomorrow):</strong></p>
-        <p>Here's a clear, expert explanation based on standard Canadian and global insurance practices...<br><br>
-        [Once we connect the Grok API, a real-time, accurate response will appear here automatically.]</p>
-        <p style="font-style:italic; color:#555;">Example topics: deductibles, liability limits, claims process, cyber coverage, D&O, business interruption, and more.</p>
+        <p><strong>Expert Answer:</strong></p>
+        <p>${data.answer.replace(/\n/g, '<br>')}</p>
       `;
-      responseDiv.style.display = 'block';
       shareSection.style.display = 'block';
+    } catch (err) {
+      responseDiv.innerHTML = `<p style='color:red;'>Error: Could not get answer. Try again later.</p>`;
     }
+  }
 
-    function shareLinkedIn() {
-      const url = "https://insuranceanswersai.ca";
-      const title = "Just asked Insurance Answers AI a question!";
-      window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`);
-    }
+  // Share functions remain the same
+  function shareLinkedIn() {
+    const url = "https://insuranceanswersai.ca";
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`);
+  }
 
-    function shareX() {
-      const text = "Check out this AI-powered insurance Q&A tool by @BraydenYork: insuranceanswersai.ca";
-      window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`);
-    }
-  </script>
+  function shareX() {
+    const text = "Just got a great insurance explanation from Insurance Answers AI: insuranceanswersai.ca";
+    window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`);
+  }
+</script>
+  
 </body>
 </html>
