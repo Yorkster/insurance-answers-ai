@@ -72,7 +72,7 @@
   margin-top: 20px;
   min-height: 80px;
 }
-    .thinking-indicator {
+   .thinking-indicator {
   text-align: center;
   padding: 30px;
   color: #3b82f6;
@@ -93,6 +93,7 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
 }
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -128,8 +129,8 @@
     <div class="chat-box">
       <h2>Ask me anything about insurance</h2>
       <p style="color:#666; max-width:700px; margin:20px auto;">Examples: "What does a deductible mean?", "How does cyber insurance work?", "What's covered under D&O?"</p>
-      <input type="text" id="question" placeholder="Type your insurance question here...and give it a few seconds" autocomplete="off" onkeypress="if(event.key==='Enter') getAnswer();">
-      <button onclick="getAnswer()">Ask</button>
+      <input type="text" id="question" placeholder="Type your insurance question here...and wait a few seconds" autocomplete="off" onkeypress="if(event.key==='Enter') getAnswer()">
+<button onclick="getAnswer()">Ask</button>
       <button onclick="clearHistory()" style="margin-top:10px; background:#dc2626; padding:10px 20px;">Clear Chat History</button>
    <div class="chat-box">
 
@@ -177,7 +178,6 @@
     const chatHistoryDiv = document.getElementById('chatHistory');
     if (!chatHistoryDiv) return;
     chatHistoryDiv.innerHTML = '';
-
     history.forEach(pair => {
       const pairDiv = document.createElement('div');
       pairDiv.className = 'message-pair';
@@ -187,7 +187,6 @@
       `;
       chatHistoryDiv.appendChild(pairDiv);
     });
-
     chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
   }
 
@@ -211,10 +210,11 @@
       return;
     }
 
+    // *** THIS IS THE LOADING INDICATOR ***
     responseDiv.innerHTML = `
       <div class="thinking-indicator">
         <div class="spinner"></div>
-        <p><strong>Thinking...</strong> Analyzing your question as an insurance expert...</p>
+        <p><strong>Thinking...</strong> Analyzing your question as an insurance expert...<br>(This can take 20–40 seconds on detailed questions)</p>
       </div>
     `;
     if (shareSection) shareSection.style.display = 'none';
@@ -251,12 +251,9 @@
   function clearHistory() {
     if (confirm('Clear all chat history?')) {
       localStorage.removeItem('insuranceChatHistory');
-      const chatHistoryDiv = document.getElementById('chatHistory');
-      const responseDiv = document.getElementById('response');
-      if (chatHistoryDiv) chatHistoryDiv.innerHTML = '';
-      if (responseDiv) responseDiv.innerHTML = '';
-      const shareSection = document.getElementById('shareSection');
-      if (shareSection) shareSection.style.display = 'none';
+      document.getElementById('chatHistory').innerHTML = '';
+      document.getElementById('response').innerHTML = '';
+      document.getElementById('shareSection').style.display = 'none';
     }
   }
 
