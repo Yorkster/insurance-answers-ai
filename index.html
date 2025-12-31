@@ -71,7 +71,7 @@
     <p><small>This tool provides general educational information only and is not personalized insurance or financial advice. Always consult a licensed professional for your specific situation.</small></p>
   </footer>
 
-    <script>
+ <script>
   async function getAnswer() {
     const question = document.getElementById('question').value.trim();
     const responseDiv = document.getElementById('response');
@@ -83,7 +83,7 @@
       return;
     }
 
-    responseDiv.innerHTML = "<p><strong>Loading...</strong> Thinking as an insurance expert...</p>";
+    responseDiv.innerHTML = "<p><strong>Thinking...</strong> Asking Grok as an insurance expert...</p>";
     responseDiv.style.display = 'block';
     shareSection.style.display = 'none';
 
@@ -94,29 +94,31 @@
         body: JSON.stringify({ question })
       });
 
-      if (!res.ok) throw new Error('API error');
-
       const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Unknown error');
+      }
+
       responseDiv.innerHTML = `
         <p><strong>Your Question:</strong> ${question}</p>
-        <p><strong>Expert Answer:</strong></p>
+        <hr>
         <p>${data.answer.replace(/\n/g, '<br>')}</p>
       `;
       shareSection.style.display = 'block';
     } catch (err) {
-      responseDiv.innerHTML = `<p style='color:red;'>Error: Could not get answer. Try again later.</p>`;
+      responseDiv.innerHTML = `<p style='color:red;'>Error: ${err.message}. Check console or try again.</p>`;
+      console.error(err);
     }
   }
 
-  // Share functions remain the same
   function shareLinkedIn() {
-    const url = "https://insuranceanswersai.ca";
-    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`);
+    window.open('https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent('https://insuranceanswersai.ca'));
   }
 
   function shareX() {
-    const text = "Just got a great insurance explanation from Insurance Answers AI: insuranceanswersai.ca";
-    window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`);
+    const text = "Just got a smart insurance answer from Insurance Answers AI:";
+    window.open('https://x.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent('https://insuranceanswersai.ca'));
   }
 </script>
   
